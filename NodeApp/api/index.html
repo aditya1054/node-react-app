@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script></script>
+
+</head>
+
+<body>
+    <button type="button" onclick="callLoginApi()">login</button>
+    <button type="button" onclick="startSeeding()">start Seeding</button>
+    <div>
+        <textarea id="login" style="width: 100%;height: auto; margin: 8px 0px 8px 0px;"></textarea>
+        <textarea id="Seeding" style="width: 100%;height: 80vh;"></textarea>
+    </div>
+
+</body>
+<script>
+    /** ------------------- Login Section Start ------------------ */
+
+    const BaseUrl = 'http://localhost:3000/'; //http://localhost:3000/user/login
+    var token = '';
+    var loginResponse = null;
+    var response = [];
+
+    function login() {
+        const url = BaseUrl + 'user/login';
+        let data = {
+            "username": "Aditya",
+            "password": "Admin@123"
+        }
+
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        };
+
+        http(url, requestOptions);
+
+    }
+
+    /** ------------------- Login Section End ------------------ */
+
+
+    /** ------------------- Common http function Section Start ------------------ */
+
+    function http(url, requestOptions) {
+        fetch(url, requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (url === 'http://localhost:3000/user/login') {
+                    console.log('Login Data : ', JSON.stringify(data));
+                    token = 'Bearer ' + data.Data.access_token;
+                    loginResponse = data.Data;
+                    document.getElementById('login').value = JSON.stringify(loginResponse);
+                } else {
+                    response.push(data.Data);
+                    document.getElementById('Seeding').value = JSON.stringify(response);
+                    console.log('Data : ', JSON.stringify(data));
+                }
+            })
+            .catch(error => {
+                console.error
+                    ('Error:', error);
+            });
+    }
+
+    /** ------------------- Common http function Section End ------------------ */
+
+    function addUser() {
+        const url = BaseUrl + 'user/create';
+
+        let data = [
+            {
+                "firstName": "Aditya",
+                "lastName": "Suryavanshi",
+                "isActive": true,
+                "username": "Aditya",
+                "role": "Admin",
+                "password": "Admin@123",
+                "createdBy": "Admin",
+                "updatedBy": "Admin"
+            },
+            {
+                "firstName": "Mahesh",
+                "lastName": "Suryavanshi",
+                "isActive": true,
+                "username": "Mahesh",
+                "role": "StakeHolder",
+                "password": "Admin@123",
+                "createdBy": "Admin",
+                "updatedBy": "Admin"
+            },
+            {
+                "firstName": "ABC",
+                "lastName": "XYZ",
+                "isActive": true,
+                "username": "ABC",
+                "role": "Manager",
+                "password": "Admin@123",
+                "createdBy": "Admin",
+                "updatedBy": "Admin"
+            }
+
+        ]
+
+        const userInterval = setInterval(seedData, 1000);
+
+        function seedData() {
+            data.forEach(element => {
+                let requestOptions = "";
+                requestOptions = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(element),
+                };
+                http(url, requestOptions);
+            });
+            clearInterval(userInterval);
+        }
+    }
+
+    function addGst() {
+        const url = BaseUrl + 'gst/create';
+
+        let data = [
+            {
+                "gstSlab": "0",
+                "description": "0 GST Slab",
+                "createdBy": "Admin",
+                "updatedBy": "Admin"
+            },
+            {
+                "gstSlab": "5",
+                "description": "5 GST Slab",
+                "createdBy": "Admin",
+                "updatedBy": "Admin"
+            },
+            {
+                "gstSlab": "8",
+                "description": "8 GST Slab",
+                "createdBy": "Admin",
+                "updatedBy": "Admin"
+            },
+            {
+                "gstSlab": "10",
+                "description": "10 GST Slab",
+                "createdBy": "Admin",
+                "updatedBy": "Admin"
+            },
+            {
+                "gstSlab": "12",
+                "description": "12 GST Slab",
+                "createdBy": "Admin",
+                "updatedBy": "Admin"
+            },
+            {
+                "gstSlab": "18",
+                "description": "18 GST Slab",
+                "createdBy": "Admin",
+                "updatedBy": "Admin"
+            },
+            {
+                "gstSlab": "28",
+                "description": "28 GST Slab",
+                "createdBy": "Admin",
+                "updatedBy": "Admin"
+            }
+        ]
+        let counter = 0;
+        const gstInterval = setInterval(seedData, 1000);
+
+        function seedData() {
+            let requestOptions = "";
+            requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "Authorization": token
+                },
+                body: JSON.stringify(data[counter]),
+            };
+            http(url, requestOptions);
+
+            counter++;
+            console.log('Counter', counter)
+            if (counter == data.length - 1) {
+                clearInterval(gstInterval);
+            }
+        }
+    }
+
+
+
+    function callLoginApi() {
+        login();
+
+    }
+
+    function startSeeding() {
+        //addUser();
+        addGst();
+    }
+
+
+
+</script>
+
+</html>
